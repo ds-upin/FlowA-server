@@ -19,6 +19,9 @@ const UnverifiedUserSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    code: {
+        type: Number,
+    },
     createdAt: {
         type: Date,
         default: Date.now,
