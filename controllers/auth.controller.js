@@ -105,12 +105,12 @@ const postLogin = async (req, res) => {
 
         return res.status(200).json({
             mess: 'Login successful.',
-            token,
             user: {
                 id: user._id,
                 name: user.name,
                 username: user.username,
-                email: user.email
+                email: user.email,
+                token
             }
         });
     } catch (err) {

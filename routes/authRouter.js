@@ -8,7 +8,7 @@ const {
     postVerifyEmail,
 } = require('../controllers/auth.controller');
 
-Router.post('register',postRegister);
+Router.post('/register',postRegister);
 Router.post('/login',postLogin);
 Router.post('/logout',postLogout);
 Router.post('/verify',postVerifyEmail);
