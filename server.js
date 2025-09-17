@@ -16,18 +16,20 @@ const cors = require('cors');
 
 const authRoute = require('./routes/authRouter');
 const contactRoute = require('./routes/ContactRouter');
+const pendingMessageRouter = require('./routes/PendingMessageRouter');
+const PendingMessage = require('./models/PendingMessage');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: "http://localhost:5173",
+        origin: "http://localhost:5173",    // ********
         methods: ['GET', 'POST'],
         credentials: true
     }
 });
 
-app.use(cors()); // to be change in production  *****
+app.use(cors()); // to be change in production  ********
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -38,13 +40,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoute);
 app.use('/api/contact', contactRoute);
-//app.use('/api/pendingMessage');
+app.use('/api/pendingMessage',pendingMessageRouter);
 //app.use('/api/sentPendingMessage');
-
-
-
-
-
 
 
 
@@ -75,19 +72,33 @@ io.on('connection', (socket) => {
         userSocketMap.set(socket.user.id, socket.id);
     });
 
-    socket.on('sendMessage', (data) => {
-        console.log(userSocketMap);
-        if (userSocketMap.has(data.id)) {
-            io.to(userSocketMap.get(data.id)).emit('recieveMessage', {
-                message: data.message,
-                senderId: data.senderId,
-                recieverId: data.id,
-                date: data.date
+    socket.on('sendMessage', async (data, callback) => {
+        const { message, senderId, id: receiverId, date } = data;
+
+        if (userSocketMap.has(receiverId)) {
+            io.to(userSocketMap.get(receiverId)).emit('recieveMessage', {
+                message,
+                senderId,
+                recieverId: receiverId,
+                date
             });
+            callback && callback({ status: 'delivered' });
         } else {
-            console.log('Recipient not connected yet, will be implemented later');
+            try {
+                await PendingMessage.create({
+                    senderId,
+                    receiverId,
+                    content: message,
+                    date: date
+                });
+                callback && callback({ status: 'pending' });
+            } catch (err) {
+                console.error('Error saving pending message:', err);
+                callback && callback({ status: 'error', error: err.message });
+            }
         }
     });
+
 
     socket.on('disconnect', () => {
         for (const [userId, sockId] of userSocketMap.entries()) {

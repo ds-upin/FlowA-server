@@ -1,25 +1,25 @@
 const mongoose = require('mongoose');
 
-const messageSchema = new mongoose.Schema({
-    target:{
-        type: mongoose
+const pendingMessageSchema = new mongoose.Schema({
+    senderId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
     },
-    messages:[
-        {
-            userId: mongoose.Types.ObjectId,
-            message:[
-                {
-                    content:{
-                        type:String
-                    },
-                    time:{
-                        type:String
-                    }
-                }
-            ]
-        }
-    ]
-},{timestamps:true});
+    receiverId: {
+        type: mongoose.Schema.Types.ObjectId,
+        required: true,
+        ref: 'User'
+    },
+    content: {
+        type: String,
+        required: true
+    },
+    date: {
+        type: Date,
+        required: true
+    }
+}, { timestamps: true });
 
-const PendingMessage = mongoose.model('pendingmessage',messageSchema);
+const PendingMessage = mongoose.model('PendingMessage', pendingMessageSchema);
 module.exports = PendingMessage;
