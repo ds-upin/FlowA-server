@@ -14,6 +14,9 @@ const http = require('http')
 const { Server } = require('socket.io');
 const cors = require('cors');
 
+const Contact = require('./models/Contacts');
+const User = require('./models/User.model');
+
 const authRoute = require('./routes/authRouter');
 const contactRoute = require('./routes/ContactRouter');
 const pendingMessageRouter = require('./routes/PendingMessageRouter');
@@ -87,6 +90,13 @@ io.on('connection', (socket) => {
             callback && callback({ status: 'delivered' });
         } else {
             try {
+                const receiverContact = await Contact.findOne({ main: receiverId });
+                if (receiverContact?.blockedList?.some(id => id.toString() === senderId.toString())) {
+                    console.log(`Message from ${senderId} blocked by receiver ${receiverId}, skipping save.`);
+                    callback && callback({ status: 'blocked' });
+                    return;
+                }
+
                 await PendingMessage.create({
                     senderId,
                     receiverId,

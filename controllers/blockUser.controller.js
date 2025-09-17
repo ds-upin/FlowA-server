@@ -52,7 +52,7 @@ const postRemoveBlock = async (req, res) => {
         }
         await Contact.updateOne(
             { main: userId },
-            { $pull: { contactList: contactId } }
+            { $pull: { blockedList: contactId } }
         );
 
         return res.status(200).json({ mess: 'Contact removed successfully' });
