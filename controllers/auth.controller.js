@@ -119,7 +119,7 @@ const postLogin = async (req, res) => {
     }
 };
 
-const postLogout = async (req, res) => { 
+const postLogout = async (req, res) => {
     return res.status(200).json({ mess: 'Logged out successfully. Please delete the token on client side.' });
 };
 
@@ -143,10 +143,31 @@ const getMe = async (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    const { ids } = req.body;
+    try {
+        const userId = req.user?.id;
+        if (!userId) {
+            return res.status(401).json({ mess: 'Unauthorized' });
+        }
+
+        const user = await User.findById(ids).select('name username');
+
+        if (!user) {
+            return res.status(404).json({ mess: 'User not found' });
+        }
+
+        return res.status(200).json({ user });
+    } catch (err) {
+        console.error('Error in getMe:', err);
+        return res.status(500).json({ mess: 'Failed to retrieve user data' });
+    }
+}
 module.exports = {
     postRegister,
     postLogin,
     postLogout,
     getMe,
     postVerifyEmail,
+    getUserById
 };

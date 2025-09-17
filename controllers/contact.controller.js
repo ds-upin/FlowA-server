@@ -66,8 +66,8 @@ const addToContact = async (req, res) => {
 const removeContact = async (req, res) => {
     const userId = req.user.id;
     const { contactId } = req.body;
-    console.log("userId",userId);
-    console.log("ContactId",contactId);
+    console.log("userId", userId);
+    console.log("ContactId", contactId);
 
     if (!contactId) {
         return res.status(400).json({ mess: 'Contact ID is required' });
@@ -90,4 +90,54 @@ const removeContact = async (req, res) => {
     }
 };
 
-module.exports = { getListAllContact, addToContact,removeContact };
+const addToContactAsList = async (req, res) => {
+    const userId = req.user.id;
+    const { ids } = req.body; 
+
+    if (!ids || !Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ mess: 'Ids are required and should be an array' });
+    }
+
+    if (ids.includes(userId)) {
+        return res.status(400).json({ mess: 'You cannot add yourself as a contact' });
+    }
+
+    try {
+        let contactDoc = await Contact.findOne({ main: userId });
+        if (!contactDoc) {
+            contactDoc = await Contact.create({ main: userId, contactList: [] });
+        }
+
+        const existingIds = new Set(contactDoc.contactList.map(id => id.toString()));
+        const addedUsers = [];
+
+        for (const id of ids) {
+            if (existingIds.has(id)) {
+                continue;
+            }
+
+            const user = await User.findById(id).select('name username _id');
+            if (!user) {
+                continue;
+            }
+
+            contactDoc.contactList.push(user._id);
+            addedUsers.push(user);
+            existingIds.add(id);
+        }
+
+        await contactDoc.save();
+
+        if (addedUsers.length === 0) {
+            return res.status(200).json({ mess: 'No new contacts were added', added: [] });
+        }
+
+        return res.status(200).json({ mess: 'Contacts added successfully', added: addedUsers });
+    } catch (err) {
+        console.error('Error adding contacts:', err);
+        return res.status(500).json({ mess: 'Server error while adding contacts' });
+    }
+};
+
+
+module.exports = { getListAllContact, addToContact, removeContact, addToContactAsList };

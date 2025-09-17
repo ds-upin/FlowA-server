@@ -6,6 +6,7 @@ const {
     postLogout,
     getMe,
     postVerifyEmail,
+    getUserById,
 } = require('../controllers/auth.controller');
 
 Router.post('/register',postRegister);
@@ -13,5 +14,6 @@ Router.post('/login',postLogin);
 Router.post('/logout',postLogout);
 Router.post('/verify',postVerifyEmail);
 Router.get('/me',getMe);
+Router.get('/getUser',getUserById);
 
 module.exports = Router;
