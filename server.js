@@ -18,6 +18,7 @@ const authRoute = require('./routes/authRouter');
 const contactRoute = require('./routes/ContactRouter');
 const pendingMessageRouter = require('./routes/PendingMessageRouter');
 const PendingMessage = require('./models/PendingMessage');
+const BlockUserRouter = require('./routes/blockUserRouter');
 
 const app = express();
 const server = http.createServer(app);
@@ -40,7 +41,8 @@ app.get('/', (req, res) => {
 
 app.use('/api/auth', authRoute);
 app.use('/api/contact', contactRoute);
-app.use('/api/pendingMessage',pendingMessageRouter);
+app.use('/api/block', BlockUserRouter);
+app.use('/api/pendingMessage', pendingMessageRouter);
 //app.use('/api/sentPendingMessage');
 
 

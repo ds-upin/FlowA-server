@@ -49,7 +49,7 @@ const addToContact = async (req, res) => {
 
         let contactDoc = await Contact.findOne({ main: userId });
         if (!contactDoc) {
-            contactDoc = await Contact.create({ main: userId, contactList: [] });
+            contactDoc = await Contact.create({ main: userId, contactList: [], blockedList:[] });
         }
         await Contact.updateOne(
             { main: userId },
