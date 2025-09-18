@@ -46,7 +46,6 @@ app.use('/api/auth', authRoute);
 app.use('/api/contact', contactRoute);
 app.use('/api/block', BlockUserRouter);
 app.use('/api/pendingMessage', pendingMessageRouter);
-//app.use('/api/sentPendingMessage');
 
 
 
