@@ -24,6 +24,9 @@ const PendingMessage = require('./models/PendingMessage');
 const BlockUserRouter = require('./routes/blockUserRouter');
 
 const app = express();
+app.get('/', (req, res) => {
+    res.status(200).json({ 'message': 'Server looks healthy' });
+});
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
@@ -41,10 +44,6 @@ app.use(cors({
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-
-app.get('/', (req, res) => {
-    res.status(200).json({ 'message': 'Server looks healthy' });
-});
 
 app.use('/api/auth', authRoute);
 app.use('/api/contact', contactRoute);
