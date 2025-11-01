@@ -49,6 +49,9 @@ app.use('/api/auth', authRoute);
 app.use('/api/contact', contactRoute);
 app.use('/api/block', BlockUserRouter);
 app.use('/api/pendingMessage', pendingMessageRouter);
+app.get('/api/health', (req,res)=>{
+    return res.status(200).json({'mess':'Server is healthy'});
+});
 
 
 
